@@ -11,8 +11,8 @@ import { Button } from "@/components/button";
 import { LinkButton } from "@/components/link-button";
 
 export default function Product() {
-  const cartStore = useCartStore()
-  const navigation = useNavigation()
+  const cartStore = useCartStore();
+  const navigation = useNavigation();
 
   const { id } = useLocalSearchParams();
 
@@ -22,12 +22,12 @@ export default function Product() {
     if (product) {
       cartStore.add(product)
       navigation.goBack()
-    }
-  }
+    };
+  };
 
   if (!product) {
     return <Redirect href="/" />
-  }
+  };
 
   return (
     <View className="flex-1">

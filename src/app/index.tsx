@@ -1,42 +1,54 @@
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
+import { View, FlatList, SectionList, Text } from "react-native";
 import { Link } from "expo-router";
+
+import { useCartStore } from "@/stores/cart-store";
+import { CATEGORIES, MENU, ProductProps } from "@/utils/data/products";
+
 import { Header } from "@/components/header";
 import { Product } from "@/components/product";
-import { View, FlatList, SectionList, Text } from "react-native";
 import { CategoryButton } from "@/components/category-button";
-import { useCartStore } from "@/stores/cart-store";
-
-import { CATEGORIES, MENU } from "@/utils/data/products";
 
 export default function Home() {
   const cartStore = useCartStore();
-  const [categorySelected, setCategorySelected] = useState(CATEGORIES[0]);
-  const sectionListRef = useRef<SectionList>(null);
-  const cartQuantityItems = cartStore.products.reduce((total, item) => total + item.quantity, 0);
+  const [category, setCategory] = useState(CATEGORIES[0]);
 
-  function handleCategorySelection(category: string) {
-    setCategorySelected(category);
+  const sectionListRef = useRef<SectionList<ProductProps>>(null);
 
-    const sectionIndex = CATEGORIES.findIndex((item) => item === category);
+  const cartQuantityItems = cartStore.products.reduce(
+    (total, product) => total + product.quantity,
+    0,
+  );
+
+  function handleCategorySelect(selectedCategory: string) {
+    setCategory(selectedCategory);
+
+    const sectionIndex = CATEGORIES.findIndex(
+      (category) => category === selectedCategory,
+    );
 
     if (sectionListRef.current) {
       sectionListRef.current.scrollToLocation({
+        animated: true,
         sectionIndex,
         itemIndex: 0,
-        animated: true,
       });
     }
-  };
+  }
 
   return (
-    <View>
-      <Header title="Faça seu pedido" cartQuantityItems={cartQuantityItems}/>
+    <View className="flex-1 pt-8">
+      <Header title="Faça seu pedido" cartQuantityItems={cartQuantityItems} />
 
       <FlatList
         data={CATEGORIES}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
-          <CategoryButton title={item} isSelected={item === categorySelected} onPress={() => handleCategorySelection(item)}/>
+          <CategoryButton
+            title={item}
+            isSelected={item === category}
+            onPress={() => handleCategorySelect(item)}
+          />
         )}
         horizontal
         className="max-h-10 mt-5"
@@ -55,14 +67,12 @@ export default function Home() {
           </Link>
         )}
         renderSectionHeader={({ section: { title } }) => (
-          <Text className="text-xl text-white font-heading mt-8 mb-3">
-            {title}
-          </Text>
+          <Text className="text-xl text-white font-heading mt-8 mb-3">{title}</Text>
         )}
-        className="p-5"
+        className="flex-1 p-5"
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 230 }}
+        contentContainerStyle={{ paddingBottom: 100 }}
       />
     </View>
   );
-}
+};
